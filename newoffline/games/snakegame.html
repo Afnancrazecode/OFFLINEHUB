@@ -122,6 +122,7 @@
     </div>
     <button class="start-btn" id="startBtn">Start Game</button>
     <button class="pause-btn" id="pauseBtn">Pause</button>
+    <div class="score">Score: <span id="score">0</span> | High Score: <span id="highScore">0</span></div>
 
     <div class="game-over-screen" id="gameOverScreen">
       <h2>Game Over! Your score: <span id="finalScore"></span></h2>
@@ -130,189 +131,223 @@
   </div>
 
   <script>
-    const canvas = document.getElementById("gameCanvas");
-    const ctx = canvas.getContext("2d");
-    const scoreDisplay = document.getElementById("score");
-    const startBtn = document.getElementById("startBtn");
-    const pauseBtn = document.getElementById("pauseBtn");
-    const gameOverScreen = document.getElementById("gameOverScreen");
-    const finalScoreDisplay = document.getElementById("finalScore");
-    const restartBtn = document.getElementById("restartBtn");
+   const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
+const scoreDisplay = document.getElementById("score");
+const startBtn = document.getElementById("startBtn");
+const pauseBtn = document.getElementById("pauseBtn");
+const gameOverScreen = document.getElementById("gameOverScreen");
+const finalScoreDisplay = document.getElementById("finalScore");
+const restartBtn = document.getElementById("restartBtn");
+const highScoreDisplay = document.getElementById("highScore");
 
-    let snake = [{ x: 200, y: 200 }];
-    let food = { x: 0, y: 0 };
-    let dx = 20;
-    let dy = 0;
-    let score = 0;
-    let level = 1;
-    let speed = 150; // Snake speed is set here, and will remain constant
-    let gameLoop;
-    let gameActive = false;
-    let isPaused = false;
+let snake = [{ x: 200, y: 200 }];
+let food = { x: 0, y: 0 };
+let dx = 20;
+let dy = 0;
+let score = 0;
+let speed = 150;
+let gameLoop;
+let gameActive = false;
+let isPaused = false;
+let highScore = localStorage.getItem("highScore") || 0;
 
-    // Sound effects
-    const eatSound = new Audio("/pop.mp3");
-    const gameOverSound = new Audio("");
+// Sound effects
+const eatSound = new Audio("/pop.mp3");
+const gameOverSound = new Audio("/gameover.mp3");
 
-    // Initialize the game
-    function initGame() {
-      snake = [{ x: 200, y: 200 }];
-      dx = 20;
-      dy = 0;
-      score = 0;
-      level = 1;
-      speed = 150; // Keep speed constant
-      scoreDisplay.textContent = score;
-      placeFood();
-      gameActive = true;
-      if (gameLoop) clearInterval(gameLoop);
-      gameLoop = setInterval(updateGame, speed); // Speed remains the same
-      gameOverScreen.style.display = "none";
-    }
+function initGame() {
+    snake = [{ x: 200, y: 200 }];
+    dx = 20;
+    dy = 0;
+    score = 0;
+    speed = 150;
+    scoreDisplay.textContent = score;
+    highScoreDisplay.textContent = highScore;
+    placeFood();
+    gameActive = true;
+    if (gameLoop) clearInterval(gameLoop);
+    gameLoop = setInterval(updateGame, speed);
+    gameOverScreen.style.display = "none";
+}
 
-    // Draw the snake
-    function drawSnake() {
-      ctx.fillStyle = "#76c7c0";
-      snake.forEach((segment) => {
+// Draw the snake
+function drawSnake() {
+    ctx.fillStyle = "#76c7c0";
+    snake.forEach((segment) => {
         ctx.fillRect(segment.x, segment.y, 20, 20);
         ctx.strokeStyle = "#2a5298";
         ctx.strokeRect(segment.x, segment.y, 20, 20);
-      });
-    }
+    });
+}
 
-    // Move the snake
-    function moveSnake() {
-      const head = { x: snake[0].x + dx, y: snake[0].y + dy };
-      snake.unshift(head);
+// Move the snake
+function moveSnake() {
+    const head = { x: snake[0].x + dx, y: snake[0].y + dy };
+    snake.unshift(head);
 
-      if (head.x === food.x && head.y === food.y) {
+    if (head.x === food.x && head.y === food.y) {
         eatSound.play();
         score += 10;
         scoreDisplay.textContent = score;
         placeFood();
-      } else {
+    } else {
         snake.pop();
-      }
     }
+}
 
-    // Check collisions
-    function checkCollision() {
-      const head = snake[0];
-      // Wall collision
-      if (head.x < 0 || head.y < 0 || head.x >= canvas.width || head.y >= canvas.height) {
-        gameOver();
-      }
-      // Self-collision
-      for (let i = 1; i < snake.length; i++) {
+// Check collisions
+function checkCollision() {
+    const head = snake[0];
+
+    // Enable Edge Wrapping
+    if (head.x < 0) head.x = canvas.width - 20;
+    else if (head.x >= canvas.width) head.x = 0;
+    if (head.y < 0) head.y = canvas.height - 20;
+    else if (head.y >= canvas.height) head.y = 0;
+
+    // Self-collision
+    for (let i = 1; i < snake.length; i++) {
         if (head.x === snake[i].x && head.y === snake[i].y) {
-          gameOver();
+            gameOver();
         }
-      }
+    }
+}
+
+// Place food
+function placeFood() {
+    let validPosition = false;
+    
+    while (!validPosition) {
+        food.x = Math.floor((Math.random() * canvas.width) / 20) * 20;
+        food.y = Math.floor((Math.random() * canvas.height) / 20) * 20;
+
+        // Ensure food doesn't spawn on the snake
+        validPosition = !snake.some(segment => segment.x === food.x && segment.y === food.y);
+    }
+}
+
+
+// Draw food
+function drawFood() {
+    ctx.fillStyle = "#ffcc00";
+    ctx.beginPath();
+    ctx.arc(food.x + 10, food.y + 10, 10, 0, Math.PI * 2);
+    ctx.fill();
+}
+function updateGame() {
+    if (!gameActive) return;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    drawFood();
+    moveSnake();
+    drawSnake();
+    checkCollision();
+}
+
+
+    // Speed increase logic
+    if (score % 50 === 0 && score !== 0 && speed > 60) {
+        speed -= 10;
+        clearInterval(gameLoop);
+        gameLoop = setInterval(updateGame, speed);
     }
 
-    // Place food
-    function placeFood() {
-      food.x = Math.floor((Math.random() * canvas.width) / 20) * 20;
-      food.y = Math.floor((Math.random() * canvas.height) / 20) * 20;
+function gameOver() {
+    gameActive = false;
+    clearInterval(gameLoop);
+    
+    // Play sound only if available
+    if (gameOverSound.src) {
+        gameOverSound.play();
     }
 
-    // Draw food
-    function drawFood() {
-      ctx.fillStyle = "#ffcc00";
-      ctx.fillRect(food.x, food.y, 20, 20);
+    // Add mobile vibration support
+    if (navigator.vibrate) {
+        navigator.vibrate([200, 100, 200]);
     }
-
-    // Update game
-    function updateGame() {
-      if (!gameActive) return;
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      drawFood();
-      moveSnake();
-      drawSnake();
-      checkCollision();
+    
+    if (score > highScore) {
+        highScore = score;
+        localStorage.setItem("highScore", highScore);
     }
+    finalScoreDisplay.textContent = score;
+    highScoreDisplay.textContent = highScore;
+    gameOverScreen.style.display = "block";
+}
 
-    // Game over
-    function gameOver() {
-      gameActive = false;
-      clearInterval(gameLoop);
-      gameOverSound.play();
-      finalScoreDisplay.textContent = score;
-      gameOverScreen.style.display = "block";
-    }
-
-    // Handle keyboard input
-    document.addEventListener("keydown", (event) => {
-      if (event.key === "ArrowUp" && dy === 0) {
+// Handle keyboard input
+document.addEventListener("keydown", (event) => {
+    if ((event.key === "ArrowUp" || event.key === "w") && dy === 0) {
         dx = 0;
         dy = -20;
-      } else if (event.key === "ArrowDown" && dy === 0) {
+    } else if ((event.key === "ArrowDown" || event.key === "s") && dy === 0) {
         dx = 0;
         dy = 20;
-      } else if (event.key === "ArrowLeft" && dx === 0) {
+    } else if ((event.key === "ArrowLeft" || event.key === "a") && dx === 0) {
         dx = -20;
         dy = 0;
-      } else if (event.key === "ArrowRight" && dx === 0) {
+    } else if ((event.key === "ArrowRight" || event.key === "d") && dx === 0) {
         dx = 20;
         dy = 0;
-      }
-    });
+    }
+});
 
-    // Touch controls for mobile devices
-    let touchStartX = 0;
-    let touchStartY = 0;
+// Touch controls for mobile devices
+let touchStartX = 0;
+let touchStartY = 0;
 
-    canvas.addEventListener("touchstart", (event) => {
-      touchStartX = event.changedTouches[0].pageX;
-      touchStartY = event.changedTouches[0].pageY;
-    });
+canvas.addEventListener("touchstart", (event) => {
+    touchStartX = event.changedTouches[0].pageX;
+    touchStartY = event.changedTouches[0].pageY;
+});
 
-    canvas.addEventListener("touchmove", (event) => {
-      const touchEndX = event.changedTouches[0].pageX;
-      const touchEndY = event.changedTouches[0].pageY;
+canvas.addEventListener("touchmove", (event) => {
+    const touchEndX = event.changedTouches[0].pageX;
+    const touchEndY = event.changedTouches[0].pageY;
 
-      const deltaX = touchEndX - touchStartX;
-      const deltaY = touchEndY - touchStartY;
+    const deltaX = touchEndX - touchStartX;
+    const deltaY = touchEndY - touchStartY;
 
-      if (Math.abs(deltaX) > Math.abs(deltaY)) {
+    if (Math.abs(deltaX) > Math.abs(deltaY)) {
         if (deltaX > 0 && dx === 0) {
-          dx = 20;
-          dy = 0;
+            dx = 20;
+            dy = 0;
         } else if (deltaX < 0 && dx === 0) {
-          dx = -20;
-          dy = 0;
+            dx = -20;
+            dy = 0;
         }
-      } else {
+    } else {
         if (deltaY > 0 && dy === 0) {
-          dx = 0;
-          dy = 20;
+            dx = 0;
+            dy = 20;
         } else if (deltaY < 0 && dy === 0) {
-          dx = 0;
-          dy = -20;
+            dx = 0;
+            dy = -20;
         }
-      }
+    }
 
-      touchStartX = touchEndX;
-      touchStartY = touchEndY;
-    });
+    touchStartX = touchEndX;
+    touchStartY = touchEndY;
+});
 
-    // Pause button
-    pauseBtn.addEventListener("click", () => {
-      if (isPaused) {
+// Pause button
+pauseBtn.addEventListener("click", () => {
+    if (isPaused) {
         gameLoop = setInterval(updateGame, speed);
         pauseBtn.textContent = "Pause";
-      } else {
+    } else {
         clearInterval(gameLoop);
         pauseBtn.textContent = "Resume";
-      }
-      isPaused = !isPaused;
-    });
+    }
+    isPaused = !isPaused;
+});
 
-    // Restart button
-    restartBtn.addEventListener("click", initGame);
+// Restart button
+restartBtn.addEventListener("click", initGame);
 
-    // Start button
-    startBtn.addEventListener("click", initGame);
+// Start button
+startBtn.addEventListener("click", initGame);
+
   </script>
 </body>
 </html>
