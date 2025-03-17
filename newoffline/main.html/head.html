@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Offline Hub</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1E88E5">
+
     <style>
         /* Reset and Global Styles */
         * {
@@ -487,5 +490,13 @@
         searchBar.value = event.results[0][0].transcript;
         showSuggestions();
     };
+    if ("serviceWorker" in navigator) {
+  navigator.serviceWorker
+    .register("/service-worker.js")
+    .then(() => console.log("Service Worker Registered"))
+    .catch((error) => console.log("Service Worker Registration Failed", error));
+}
+
+
     </script>
     
