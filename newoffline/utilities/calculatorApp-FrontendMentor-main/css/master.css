@@ -1,0 +1,224 @@
+:root{
+  --bg-main: hsl(222, 26%, 31%); /*  */
+  --bg-toggle: hsl(223, 31%, 20%);
+  --bg-screen: hsl(224, 36%, 15%);
+
+  --key-del-bg: hsl(225, 21%, 49%);
+  --key-del-shadow:  hsl(224, 28%, 35%);
+
+  --key-equal-bg: hsl(6, 63%, 50%);
+  --key-equal-shadow: hsl(6, 70%, 34%);
+
+  --key-bg: hsl(30, 25%, 89%);
+  --key-shadow: hsl(28, 16%, 65%);
+
+  --text-pr: hsl(221, 14%, 31%);
+  --text-sec: hsl(0, 0%, 100%);
+  --text-white: hsl(0, 0%, 100%);
+
+  --text-ter: hsl(0, 0%, 100%);
+}
+
+
+*{
+  box-sizing: border-box;
+}
+
+body{
+  margin: 0;
+  font-family: 'Spartan', sans-serif;
+  background-color: var(--bg-main);
+  user-select: none;
+}
+
+.loader{
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 99;
+  background: var(--bg-main);
+}
+
+.hidden{
+  animation: fadeout 2s;
+  animation-fill-mode: forwards;
+}
+
+main{
+  display: flex;
+  flex-direction: column;
+  background-color: var(--bg-main);
+  max-width: 450px;
+  margin: 4rem auto;
+}
+
+.head{
+  margin: .5rem;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--text-ter);
+}
+
+.calc{
+  font-size: 32px;
+}
+
+.theme{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 12px;
+}
+
+.theme>p{
+  margin-right: 1rem;
+}
+
+.container{
+  position: relative;
+}
+
+
+.switcher{
+  position: absolute;
+  width: 85px;
+  height: 30px;
+  left: 10px;
+  top: -30px;
+  display: flex;
+  justify-content: space-between;
+  padding: 3px;
+}
+
+.theme-switch{
+  width: 100%;
+  height: 44px;
+  z-index: 99;
+  cursor: pointer;
+}
+
+.toggle{
+  width: 90px;
+  height: 30px;
+  background-color: var(--bg-toggle);
+  border-radius: 15px;
+  padding: 4px;
+  position: relative;
+}
+
+.toggle-switch{
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background-color: var(--key-equal-bg);
+  transition: all 0.4s ease-in-out;
+}
+
+.toggle-half{
+  transform: translateX(calc(45px - 15px));
+}
+
+.toggle-full{
+  transform: translateX(calc(90px - 30px));
+}
+
+
+
+
+.output{
+  font-weight: 700;
+  font-size: 2rem;
+  height: 4rem;
+  padding: 1rem .5rem;
+  margin: .5rem;
+  background-color: var(--bg-screen);
+  text-align: right;
+  color: var(--text-ter);
+}
+
+.keypad{
+  padding: .5rem;
+  margin: .5rem;
+  background-color: var(--bg-toggle);
+  font-weight: 700;
+  font-size: 2rem;
+  display: grid;
+  grid-template-columns: 25% 25% 25% 25%;
+  grid-template-rows: 20% 20% 20% 20% 20%;
+}
+
+.btn{
+  padding: .5rem;
+  margin: .5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: .5rem;
+  cursor: pointer;
+}
+
+.btn:active{
+  animation-name: clicked;
+  animation-duration: 0.2s;
+}
+
+.num-btn, .calc-btn{
+  background-color: var(--key-bg);
+  color: var(--text-pr);
+  border-top: solid 5px var(--key-bg);
+  border-bottom: solid 5px var(--key-shadow);
+
+}
+
+.del{
+  background-color: var(--key-del-bg);
+  color: var(--text-white);
+  border-bottom: solid 5px var(--key-del-shadow);
+  font-size: 1.25rem;
+
+}
+
+.reset{
+  grid-column-start: 1;
+  grid-column-end: 3;
+  font-size: 1.25rem;
+  background-color: var(--key-del-bg);
+  color: var(--text-white);
+  border-bottom: solid 5px var(--key-del-shadow);
+}
+
+.equal{
+  grid-column-start: 3;
+  grid-column-end: 5;
+  font-size: 1.25rem;
+  background-color: var(--key-equal-bg);
+  color: var(--text-sec);
+  border-bottom: solid 5px var(--key-equal-shadow);
+}
+
+.attribution { font-size: 11px; text-align: center; color: var(--text-ter)}
+.attribution a { font-size: 14px; color: inherit;}
+
+@media (min-width: 750px) {
+  main{
+    margin: 2rem auto;
+  }
+}
+
+@keyframes fadeout {
+    100%{
+      visibility: hidden;
+      opacity: 0;
+    }
+}
+
+@keyframes clicked {
+  0%   {border-top: solid 0 var(--bg-toggle); border-bottom: solid 5px var(--bg-toggle);}
+  25%  {border-top: solid 2px  var(--bg-toggle); border-bottom: solid 2px var(--bg-toggle);}
+  50%  {border-top: solid 5px var(--bg-toggle); border-bottom: solid 0 var(--bg-toggle);}
+  100% {border-top: solid 0 var(--bg-toggle); border-bottom: solid 5px var(--bg-toggle);}
+}
