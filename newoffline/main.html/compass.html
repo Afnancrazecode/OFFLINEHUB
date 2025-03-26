@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Compass</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #282c34;
+            color: white;
+            font-family: Arial, sans-serif;
+            flex-direction: column;
+            text-align: center;
+        }
+        .compass {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            border: 5px solid white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: radial-gradient(circle, #444, #222);
+        }
+        .needle {
+            position: absolute;
+            width: 6px;
+            height: 100px;
+            background: red;
+            top: 50px;
+            transform-origin: bottom center;
+            transition: transform 0.2s ease-out;
+        }
+        .directions {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .directions span {
+            position: absolute;
+        }
+        .north { top: 10px; }
+        .south { bottom: 10px; }
+        .east { right: 10px; }
+        .west { left: 10px; }
+        .heading-display {
+            margin-top: 20px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+        .warning {
+            color: yellow;
+            margin-top: 10px;
+        }
+        .theme-toggle {
+            margin-top: 20px;
+            padding: 10px;
+            font-size: 16px;
+            background: white;
+            color: black;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .light-mode {
+            background-color: white;
+            color: black;
+        }
+        .light-mode .compass {
+            border-color: black;
+            background: radial-gradient(circle, #ddd, #aaa);
+        }
+        .light-mode .needle {
+            background: blue;
+        }
+    </style>
+</head>
+<body>
+    <h2>Enhanced Compass</h2>
+    <div class="compass">
+        <div class="needle" id="needle"></div>
+        <div class="directions">
+            <span class="north">N</span>
+            <span class="south">S</span>
+            <span class="east">E</span>
+            <span class="west">W</span>
+        </div>
+    </div>
+    <div class="heading-display" id="heading-display">Heading: 0°</div>
+    <div class="warning" id="warning"></div>
+    <button class="theme-toggle" onclick="toggleTheme()">Toggle Theme</button>
+    <button onclick="requestPermissions()">Enable Compass</button>
+
+    <script>
+        function updateHeading(heading) {
+            document.getElementById("needle").style.transform = `rotate(${heading}deg)`;
+            document.getElementById("heading-display").innerText = `Heading: ${Math.round(heading)}°`;
+        }
+
+        function requestPermissions() {
+            if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+                DeviceOrientationEvent.requestPermission()
+                    .then(permissionState => {
+                        if (permissionState === 'granted') {
+                            startCompass();
+                        } else {
+                            document.getElementById("warning").innerText = "Permission denied. Enable motion & orientation access in settings.";
+                        }
+                    })
+                    .catch(console.error);
+            } else {
+                startCompass();
+            }
+        }
+
+        function startCompass() {
+            if (window.DeviceOrientationEvent) {
+                window.addEventListener('deviceorientation', function(event) {
+                    let heading = event.webkitCompassHeading;
+                    if (typeof heading === "undefined" && event.alpha !== null) {
+                        heading = 360 - event.alpha;
+                    }
+                    if (heading !== null && heading !== undefined) {
+                        updateHeading(heading);
+                    } else {
+                        document.getElementById("warning").innerText = "Compass data unavailable. Try again later.";
+                    }
+                }, false);
+            } else {
+                document.getElementById("warning").innerText = "Your device does not support compass functionality.";
+            }
+        }
+
+        function toggleTheme() {
+            document.body.classList.toggle("light-mode");
+        }
+    </script>
+</body>
+</html>

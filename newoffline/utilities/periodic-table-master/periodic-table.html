@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+<title>Periodic Table of the Elements...</title>
+
+<style>
+#periodicTable table {
+/*  table-layout: fixed;*/
+  width: 100%;
+  border-collapse: collapse;
+  border: 3px solid purple;
+}
+
+#periodicTable th, #periodicTable td {
+padding: 2px;
+}
+
+</style>
+</head>
+<body>
+<div aria-live="polite" id="status"></div>
+
+<div>
+<label>Check this to enable full keyboard navigation:
+<input autofocus id="enableArrowKeyNavigation" type="checkbox">
+(focus will automatically shift to the first cell of the table)
+</label>
+</div>
+
+<div id="container"></div>
+
+<!-- crossorigin="anonymous" needed so that periodic table data can be imported -->
+
+<script src="createPeriodicTable.js"></script>
+
+<script>
+const dataURL = "./periodicTableData.json";
+let table;
+const enableArrowKeyNavigation = document.querySelector("#enableArrowKeyNavigation");
+const container = document.querySelector("#container");
+
+displayTable (dataURL, enableArrowKeyNavigation.checked, statusMessage, container);
+enableArrowKeyNavigation.addEventListener("change", e => displayTable(dataURL, e.target.checked, statusMessage, container));
+
+
+function statusMessage (text) {
+const status = document.querySelector("#status");
+status.textContent = "";
+status.textContent = text;
+} // statusMessage
+</script>
+
+</body>
+</html>
