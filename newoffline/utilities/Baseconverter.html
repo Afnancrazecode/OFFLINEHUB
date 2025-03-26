@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SuperCalculator - Binary Calculator</title>
+  <link href='https://fonts.googleapis.com/css?family=Satisfy' rel='stylesheet'>
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #4facfe, #00f2fe);
+      text-align: center;
+      color: white;
+      margin: 0;
+      padding: 20px;
+    }
+    .calculator, .container {
+      background: rgba(255, 255, 255, 0.9);
+      width: 90%;
+      max-width: 500px;
+      margin: 20px auto;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+      color: black;
+    }
+    h2, h1 {
+      font-size: 26px;
+      color: rgb(0, 0, 0);
+    }
+    form {
+      margin-bottom: 15px;
+    }
+    input[type="text"] {
+      width: 90%;
+      padding: 10px;
+      font-size: 16px;
+      margin-top: 5px;
+      border: 2px solid #4facfe;
+      border-radius: 5px;
+    }
+    input[type="button"] {
+      background: #4facfe;
+      color: white;
+      border: none;
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 5px;
+      cursor: pointer;
+      margin: 5px;
+      transition: 0.3s;
+    }
+    input[type="button"]:hover {
+      background: #00c3ff;
+    }
+    .ans {
+      font-size: 18px;
+      font-weight: bold;
+      margin-top: 10px;
+      color: black;
+    }
+    .section {
+      margin-top: 20px;
+    }
+    .output {
+      display: block;
+      font-size: 18px;
+      font-weight: bold;
+      margin-top: 5px;
+    }
+    footer {
+      margin-top: 20px;
+      color: white;
+      font-size: 14px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="calculator">
+    <h2>Arithmetic Calculator</h2>
+    
+    <p>First Number Input in:</p>
+    <form>
+      <label><input type="radio" name="input" value="bin"> Binary</label>
+      <label><input type="radio" name="input" value="oct"> Octal</label>
+      <label><input type="radio" name="input" value="dec"> Decimal</label>
+      <label><input type="radio" name="input" value="hex"> Hexadecimal</label>
+    </form>
+
+    <p>Second Number Input in:</p>
+    <form>
+      <label><input type="radio" name="opinput" value="bin"> Binary</label>
+      <label><input type="radio" name="opinput" value="oct"> Octal</label>
+      <label><input type="radio" name="opinput" value="dec"> Decimal</label>
+      <label><input type="radio" name="opinput" value="hex"> Hexadecimal</label>
+    </form>
+
+    <p>Output in:</p>
+    <form>
+      <label><input type="radio" name="output" value="bin"> Binary</label>
+      <label><input type="radio" name="output" value="oct"> Octal</label>
+      <label><input type="radio" name="output" value="dec"> Decimal</label>
+      <label><input type="radio" name="output" value="hex"> Hexadecimal</label>
+    </form>
+
+    <p>Operation to perform:</p>
+    <form>
+      <label><input type="radio" name="operation" value="add"> Addition</label>
+      <label><input type="radio" name="operation" value="sub"> Subtraction</label>
+      <label><input type="radio" name="operation" value="mul"> Multiplication</label>
+      <label><input type="radio" name="operation" value="div"> Division</label>
+    </form>
+
+    <form>
+      <input type="text" id="box1" placeholder="First Number">
+      <input type="text" id="box2" placeholder="Second Number">
+    </form>
+
+    <form class="button">
+      <input type="button" value="Submit" onclick="process();">
+      <input type="button" value="Clear" onclick="clr();">
+    </form>
+
+    <div class="ans">Answer = <span id="ans"></span></div>
+  </div>
+
+  <h1>Binary, Decimal, and Hex Converter</h1>
+  <div class="container">
+    <div class="section">
+      <h2>Binary</h2>
+      <input type="text" id="binary">
+      <button onclick="convert('binary', 'decimal')">To Decimal</button>
+      <button onclick="convert('binary', 'hex')">To Hex</button>
+      <span id="bOutput" class="output"></span>
+    </div>
+
+    <div class="section">
+      <h2>Decimal</h2>
+      <input type="text" id="decimal">
+      <button onclick="convert('decimal', 'binary')">To Binary</button>
+      <button onclick="convert('decimal', 'hex')">To Hex</button>
+      <span id="dOutput" class="output"></span>
+    </div>
+
+    
+  </div>
+
+  <footer>
+    <h5>&copy; 2025 | Last Modified: <script>document.write(document.lastModified);</script></h5>
+  </footer>
+
+  <script>
+    function getCheckedValue(name) {
+      let radios = document.getElementsByName(name);
+      for (let radio of radios) {
+        if (radio.checked) return radio.value;
+      }
+      return null;
+    }
+
+    function process() {
+      let num1 = document.getElementById("box1").value;
+      let num2 = document.getElementById("box2").value;
+      let inputBase = getCheckedValue("input");
+      let opInputBase = getCheckedValue("opinput");
+      let outputBase = getCheckedValue("output");
+      let operation = getCheckedValue("operation");
+
+      if (!num1 || !num2 || !inputBase || !opInputBase || !outputBase || !operation) {
+        alert("Please fill all fields.");
+        return;
+      }
+
+      let n1 = parseInt(num1, getBase(inputBase));
+      let n2 = parseInt(num2, getBase(opInputBase));
+      let result;
+
+      switch (operation) {
+        case "add": result = n1 + n2; break;
+        case "sub": result = n1 - n2; break;
+        case "mul": result = n1 * n2; break;
+        case "div": result = n2 !== 0 ? n1 / n2 : "Error"; break;
+        default: result = "Invalid Operation";
+      }
+
+      document.getElementById("ans").innerText = result !== "Error" ? result.toString(getBase(outputBase)) : "Error";
+    }
+
+    function getBase(type) {
+      return { bin: 2, oct: 8, dec: 10, hex: 16 }[type];
+    }
+
+    function clr() {
+      document.getElementById("box1").value = "";
+      document.getElementById("box2").value = "";
+      document.getElementById("ans").innerText = "";
+    }
+    function convert(from, to) {
+        let inputValue = document.getElementById(from).value;
+        let outputField = document.getElementById(from.charAt(0) + "Output");
+        
+        if (!inputValue) {
+            alert("Please enter a value.");
+            return;
+        }
+        
+        let convertedValue;
+        try {
+            let decimalValue = parseInt(inputValue, getBase(from)); // Convert input to decimal first
+            if (isNaN(decimalValue)) {
+                alert("Invalid input. Please enter a valid number.");
+                return;
+            }
+            convertedValue = decimalValue.toString(getBase(to)); // Convert to target base
+            outputField.innerText = `Result: ${convertedValue.toUpperCase()}`;
+        } catch (e) {
+            alert("Conversion Error");
+        }
+    }
+    
+    function getBase(type) {
+        return { binary: 2, decimal: 10, hex: 16 }[type];
+    }
+  </script>
+
+</body>
+</html>

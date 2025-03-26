@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Age Calculator</title>
+    <link href='https://fonts.googleapis.com/css?family=Satisfy' rel='stylesheet'>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #2C3E50;
+            color: white;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 400px;
+            margin: 50px auto;
+            background: #34495E;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+        }
+        select, input[type="button"] {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border: none;
+            border-radius: 5px;
+        }
+        input[type="button"] {
+            background: #1ABC9C;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        input[type="button"]:hover {
+            background: #16A085;
+        }
+        .results {
+            margin-top: 20px;
+            text-align: left;
+        }
+    </style>
+    <script>
+        function calAge() {
+            let day = document.getElementById("day").value;
+            let month = document.getElementById("month").value;
+            let year = document.getElementById("year").value;
+            
+            let birthDate = new Date(year, month - 1, day);
+            let today = new Date();
+            
+            let age = today.getFullYear() - birthDate.getFullYear();
+            let m = today.getMonth() - birthDate.getMonth();
+            let d = today.getDate() - birthDate.getDate();
+            
+            if (m < 0 || (m === 0 && d < 0)) {
+                age--;
+            }
+            
+            let ageInMonths = age * 12 + m;
+            let ageInDays = Math.floor((today - birthDate) / (1000 * 60 * 60 * 24));
+            let ageInSeconds = Math.floor((today - birthDate) / 1000);
+            
+            let nextBirthday = new Date(today.getFullYear(), birthDate.getMonth(), birthDate.getDate());
+            if (nextBirthday < today) {
+                nextBirthday.setFullYear(today.getFullYear() + 1);
+            }
+            let daysUntilNextBirthday = Math.floor((nextBirthday - today) / (1000 * 60 * 60 * 24));
+            
+            document.getElementById("age").innerHTML = `
+                Your Age: <b>${age} years</b><br>
+                In Months: <b>${ageInMonths} months</b><br>
+                In Days: <b>${ageInDays} days</b><br>
+                In Seconds: <b>${ageInSeconds} seconds</b><br>
+                Your next birthday is in: <b>${daysUntilNextBirthday} days</b>
+            `;
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h2>Age Calculator</h2>
+        <label>Select Date of Birth:</label><br>
+        <select id="day"></select>
+        <select id="month"></select>
+        <select id="year"></select>
+        <input type="button" value="Calculate Age" onclick="calAge()">
+        <div class="results" id="age"></div>
+    </div>
+    <script>
+        let daySelect = document.getElementById("day");
+        let monthSelect = document.getElementById("month");
+        let yearSelect = document.getElementById("year");
+        
+        for (let i = 1; i <= 31; i++) {
+            daySelect.innerHTML += `<option value="${i}">${i}</option>`;
+        }
+        for (let i = 1; i <= 12; i++) {
+            monthSelect.innerHTML += `<option value="${i}">${i}</option>`;
+        }
+        let currentYear = new Date().getFullYear();
+        for (let i = currentYear; i >= 1900; i--) {
+            yearSelect.innerHTML += `<option value="${i}">${i}</option>`;
+        }
+    </script>
+</body>
+</html>
