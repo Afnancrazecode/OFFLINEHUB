@@ -3,147 +3,416 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Enhanced Compass</title>
+    <title>Kids Zone - OfflineHub</title>
     <style>
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #282c34;
-            color: white;
-            font-family: Arial, sans-serif;
-            flex-direction: column;
-            text-align: center;
-        }
-        .compass {
-            position: relative;
-            width: 200px;
-            height: 200px;
-            border: 5px solid white;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: radial-gradient(circle, #444, #222);
-        }
-        .needle {
-            position: absolute;
-            width: 6px;
-            height: 100px;
-            background: red;
-            top: 50px;
-            transform-origin: bottom center;
-            transition: transform 0.2s ease-out;
-        }
-        .directions {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 24px;
-            font-weight: bold;
-        }
-        .directions span {
-            position: absolute;
-        }
-        .north { top: 10px; }
-        .south { bottom: 10px; }
-        .east { right: 10px; }
-        .west { left: 10px; }
-        .heading-display {
-            margin-top: 20px;
-            font-size: 20px;
-            font-weight: bold;
-        }
-        .warning {
-            color: yellow;
-            margin-top: 10px;
-        }
-        .theme-toggle {
-            margin-top: 20px;
-            padding: 10px;
-            font-size: 16px;
-            background: white;
-            color: black;
-            border: none;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-        .light-mode {
-            background-color: white;
-            color: black;
-        }
-        .light-mode .compass {
-            border-color: black;
-            background: radial-gradient(circle, #ddd, #aaa);
-        }
-        .light-mode .needle {
-            background: blue;
-        }
+        body { font-family: Comic Sans MS, sans-serif; text-align: center; background: #ffebcd; }
+        h1 { color: #ff4500; font-size: 36px; }
+        .container { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; padding: 20px; }
+        .feature { width: 200px; height: 100px; background: #ffcc00; display: flex; align-items: center; justify-content: center; border-radius: 10px; cursor: pointer; font-size: 16px; font-weight: bold; box-shadow: 5px 5px 10px rgba(0,0,0,0.2); transition: 0.3s; }
+        .feature:hover { background: #ff9900; transform: scale(1.1); }
+        canvas { border: 2px solid black; background: white; }
+        .hidden { display: none; }
+        .memory-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 20px auto; max-width: 500px; }
+        .memory-card { width: 100px; height: 100px; perspective: 1000px; cursor: pointer; }
+        .memory-card div { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; display: flex; align-items: center; justify-content: center; font-size: 2em; border-radius: 10px; transition: transform 0.6s; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .front { background: #ff9900; transform: rotateY(0deg); }
+        .back { background: white; transform: rotateY(180deg); }
+        .flipped .front { transform: rotateY(180deg); }
+        .flipped .back { transform: rotateY(0deg); }
+        .color-picker { display: flex; gap: 10px; justify-content: center; margin: 10px; }
+        .color-option { width: 30px; height: 30px; border-radius: 50%; cursor: pointer; border: 2px solid #000; }
+        .puzzle-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; margin: 20px auto; width: 300px; }
+        .puzzle-piece { width: 100px; height: 100px; border: 1px solid #000; background-size: cover; cursor: pointer; }
     </style>
 </head>
 <body>
-    <h2>Enhanced Compass</h2>
-    <div class="compass">
-        <div class="needle" id="needle"></div>
-        <div class="directions">
-            <span class="north">N</span>
-            <span class="south">S</span>
-            <span class="east">E</span>
-            <span class="west">W</span>
+    <h1>🎨 Kids Zone - Fun & Learning 🎮</h1>
+    <div class="container">
+        <div class="feature" data-game="alphabet">Alphabet Learning</div>
+        <div class="feature" data-game="numbers">Number Learning</div>
+        <div class="feature" data-game="memory">Memory Match</div>
+        <div class="feature" data-game="coloring">Coloring Book</div>
+        <div class="feature" data-game="puzzle">Puzzle Game</div>
+        <div class="feature" data-game="music">Music Maker</div>
+        <div class="feature" data-game="animals">Guess the Animal Sound</div>
+        <div class="feature" data-game="math">Balloon Pop Math</div>
+        <div class="feature" data-game="story">Story Builder</div>
+        <div class="feature" data-game="shapes">Learn Shapes</div>
+        <div class="feature" data-game="colors">Color Matching</div>
+        <div class="feature" data-game="clock">Learn the Clock</div>
+        <div class="feature" data-game="flashcards">Flashcards</div>
+        <div class="feature" data-game="finddiff">Find the Difference</div>
+    </div>
+
+    <!-- Game Sections -->
+    <div id="alphabet" class="hidden">
+        <h2>Alphabet Learning</h2>
+        <p id="letter" style="font-size:100px;">A</p>
+        <button id="nextLetter">Next Letter</button>
+    </div>
+
+    <div id="numbers" class="hidden">
+        <h2>Number Learning</h2>
+        <p id="number" style="font-size:100px;">1</p>
+        <button id="nextNumber">Next Number</button>
+    </div>
+
+    <div id="memory" class="hidden">
+        <h2>Memory Match</h2>
+        <div class="memory-grid"></div>
+    </div>
+
+    <div id="coloring" class="hidden">
+        <h2>Coloring Book</h2>
+        <div class="color-picker">
+            <div class="color-option" style="background: #ff0000" data-color="#ff0000"></div>
+            <div class="color-option" style="background: #00ff00" data-color="#00ff00"></div>
+            <div class="color-option" style="background: #0000ff" data-color="#0000ff"></div>
+            <div class="color-option" style="background: #ffff00" data-color="#ffff00"></div>
+            <div class="color-option" style="background: #000000" data-color="#000000"></div>
+        </div>
+        <canvas id="canvas" width="400" height="400"></canvas>
+        <button id="clearCanvas">Clear</button>
+    </div>
+
+    <div id="puzzle" class="hidden">
+        <h2>Puzzle Game</h2>
+        <div class="puzzle-grid"></div>
+    </div>
+
+    <div id="music" class="hidden">
+        <h2>Music Maker</h2>
+        <div class="music-keys">
+            <button class="music-key" data-note="C4">🎹 C</button>
+            <button class="music-key" data-note="D4">🎹 D</button>
+            <button class="music-key" data-note="E4">🎹 E</button>
+            <button class="music-key" data-note="F4">🎹 F</button>
+            <button class="music-key" data-note="G4">🎹 G</button>
         </div>
     </div>
-    <div class="heading-display" id="heading-display">Heading: 0°</div>
-    <div class="warning" id="warning"></div>
-    <button class="theme-toggle" onclick="toggleTheme()">Toggle Theme</button>
-    <button onclick="requestPermissions()">Enable Compass</button>
+    <div id="puzzle" class="hidden">
+        <h2>Puzzle Game</h2>
+        <p>Arrange the pieces to complete the picture!</p>
+    </div>
+    
+    <div id="music" class="hidden">
+        <h2>Music Maker</h2>
+        <button onclick="playSound('C')">C</button>
+        <button onclick="playSound('D')">D</button>
+        <button onclick="playSound('E')">E</button>
+        <button onclick="playSound('F')">F</button>
+    </div>
+    
+    <div id="animals" class="hidden">
+        <h2>Guess the Animal Sound</h2>
+        <button onclick="playAnimalSound()">Play Sound</button>
+        <p id="animalName">?</p>
+    </div>
+    
+    <div id="math" class="hidden">
+        <h2>Balloon Pop Math</h2>
+        <p>Solve the equation and pop the correct balloon!</p>
+    </div>
+    
+    <div id="story" class="hidden">
+        <h2>Story Builder</h2>
+        <p>Click to add sentences and build a fun story!</p>
+        <button onclick="addSentence()">Add Sentence</button>
+        <p id="storyText"></p>
+    </div>
+    
+    <div id="shapes" class="hidden">
+        <h2>Learn Shapes</h2>
+        <p id="shapeName">Circle</p>
+        <button onclick="nextShape()">Next Shape</button>
+    </div>
+    
+    <div id="colors" class="hidden">
+        <h2>Color Matching</h2>
+        <p>Match the correct colors!</p>
+    </div>
+    
+    <div id="clock" class="hidden">
+        <h2>Learn the Clock</h2>
+        <p>Set the correct time!</p>
+    </div>
+    
+    <div id="flashcards" class="hidden">
+        <h2>Flashcards</h2>
+        <p id="flashcard">Apple</p>
+        <button onclick="nextFlashcard()">Next</button>
+    </div>
+    
+    <div id="finddiff" class="hidden">
+        <h2>Find the Difference</h2>
+        <p>Spot the differences between the images!</p>
+    </div>
+    
+    <!-- Remaining game sections would be added similarly -->
 
     <script>
-        function updateHeading(heading) {
-            document.getElementById("needle").style.transform = `rotate(${heading}deg)`;
-            document.getElementById("heading-display").innerText = `Heading: ${Math.round(heading)}°`;
-        }
+        document.addEventListener('DOMContentLoaded', () => {
+    // Game Manager
+    const games = {
+        alphabet: {
+            currentIndex: 0,
+            init: () => {
+                document.getElementById('nextLetter').addEventListener('click', () => {
+                    games.alphabet.currentIndex = (games.alphabet.currentIndex + 1) % 26;
+                    document.getElementById('letter').textContent = 
+                        String.fromCharCode(65 + games.alphabet.currentIndex);
+                });
+            }
+        },
 
-        function requestPermissions() {
-            if (typeof DeviceOrientationEvent.requestPermission === 'function') {
-                DeviceOrientationEvent.requestPermission()
-                    .then(permissionState => {
-                        if (permissionState === 'granted') {
-                            startCompass();
-                        } else {
-                            document.getElementById("warning").innerText = "Permission denied. Enable motion & orientation access in settings.";
+        numbers: {
+            currentNumber: 1,
+            init: () => {
+                document.getElementById('nextNumber').addEventListener('click', () => {
+                    games.numbers.currentNumber = games.numbers.currentNumber % 10 + 1;
+                    document.getElementById('number').textContent = games.numbers.currentNumber;
+                });
+            }
+        },
+
+        memory: {
+            cards: ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊'],
+            flipped: [],
+            init: () => {
+                const grid = document.querySelector('.memory-grid');
+                const gameCards = [...games.memory.cards, ...games.memory.cards]
+                    .sort(() => Math.random() - 0.5);
+                
+                grid.innerHTML = gameCards.map(card => `
+                    <div class="memory-card">
+                        <div class="front"></div>
+                        <div class="back">${card}</div>
+                    </div>
+                `).join('');
+
+                document.querySelectorAll('.memory-card').forEach(card => {
+                    card.addEventListener('click', () => {
+                        if (!card.classList.contains('flipped') && games.memory.flipped.length < 2) {
+                            card.classList.add('flipped');
+                            games.memory.flipped.push(card);
+                            
+                            if (games.memory.flipped.length === 2) {
+                                const [card1, card2] = games.memory.flipped;
+                                if (card1.querySelector('.back').textContent === card2.querySelector('.back').textContent) {
+                                    games.memory.flipped = [];
+                                    if (document.querySelectorAll('.flipped').length === gameCards.length) {
+                                        setTimeout(() => alert('You won!'), 500);
+                                    }
+                                } else {
+                                    setTimeout(() => {
+                                        card1.classList.remove('flipped');
+                                        card2.classList.remove('flipped');
+                                        games.memory.flipped = [];
+                                    }, 1000);
+                                }
+                            }
                         }
-                    })
-                    .catch(console.error);
-            } else {
-                startCompass();
+                    });
+                });
+            }
+        },
+
+        coloring: {
+            init: () => {
+                const canvas = document.getElementById('canvas');
+                const ctx = canvas.getContext('2d');
+                let isDrawing = false;
+                let currentColor = '#000000';
+
+                ctx.lineWidth = 8;
+                ctx.lineCap = 'round';
+
+                // Drawing functionality
+                const startDrawing = e => {
+                    isDrawing = true;
+                    ctx.beginPath();
+                    ctx.moveTo(e.offsetX, e.offsetY);
+                };
+
+                const draw = e => {
+                    if (!isDrawing) return;
+                    ctx.strokeStyle = currentColor;
+                    ctx.lineTo(e.offsetX, e.offsetY);
+                    ctx.stroke();
+                };
+
+                canvas.addEventListener('mousedown', startDrawing);
+                canvas.addEventListener('mousemove', draw);
+                canvas.addEventListener('mouseup', () => isDrawing = false);
+                canvas.addEventListener('mouseout', () => isDrawing = false);
+
+                // Color selection
+                document.querySelectorAll('.color-option').forEach(option => {
+                    option.addEventListener('click', () => {
+                        currentColor = option.dataset.color;
+                    });
+                });
+
+                // Clear canvas
+                document.getElementById('clearCanvas').addEventListener('click', () => {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                });
+            }
+        },
+
+        puzzle: {
+            init: () => {
+                const grid = document.querySelector('.puzzle-grid');
+                const pieces = Array.from({ length: 9 }, (_, i) => i + 1);
+                
+                // Shuffle pieces
+                pieces.sort(() => Math.random() - 0.5);
+                
+                grid.innerHTML = pieces.map(num => `
+                    <div class="puzzle-piece" data-piece="${num}"
+                         style="background-image: url('https://picsum.photos/300/300?random=${num}')">
+                    </div>
+                `).join('');
+
+                let emptySlot = 9;
+                
+                document.querySelectorAll('.puzzle-piece').forEach(piece => {
+                    piece.addEventListener('click', () => {
+                        const pieceNumber = parseInt(piece.dataset.piece);
+                        if (isAdjacent(pieceNumber, emptySlot)) {
+                            // Swap positions
+                            const temp = emptySlot;
+                            emptySlot = pieceNumber;
+                            piece.dataset.piece = temp;
+                            piece.style.backgroundImage = 
+                                `url('https://picsum.photos/300/300?random=${temp}')`;
+                        }
+                    });
+                });
+
+                function isAdjacent(a, b) {
+                    const diff = Math.abs(a - b);
+                    return diff === 1 || diff === 3;
+                }
+            }
+        },
+
+        music: {
+            init: () => {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillatorMap = new Map();
+
+                document.querySelectorAll('.music-key').forEach(key => {
+                    key.addEventListener('mousedown', () => {
+                        const oscillator = audioContext.createOscillator();
+                        const gainNode = audioContext.createGain();
+                        
+                        oscillator.type = 'sine';
+                        oscillator.frequency.setValueAtTime(
+                            getFrequency(key.dataset.note), audioContext.currentTime);
+                        
+                        gainNode.gain.setValueAtTime(0.5, audioContext.currentTime);
+                        
+                        oscillator.connect(gainNode).connect(audioContext.destination);
+                        oscillator.start();
+                        key.style.transform = 'scale(0.9)';
+                        oscillatorMap.set(key, { oscillator, gainNode });
+                    });
+
+                    key.addEventListener('mouseup', () => {
+                        const { oscillator, gainNode } = oscillatorMap.get(key);
+                        gainNode.gain.exponentialRampToValueAtTime(
+                            0.001, audioContext.currentTime + 0.1);
+                        oscillator.stop(audioContext.currentTime + 0.1);
+                        key.style.transform = 'scale(1)';
+                        oscillatorMap.delete(key);
+                    });
+                });
+
+                function getFrequency(note) {
+                    const notes = { 'C4': 261.63, 'D4': 293.66, 'E4': 329.63, 
+                                   'F4': 349.23, 'G4': 392.00 };
+                    return notes[note];
+                }
             }
         }
+    };
 
-        function startCompass() {
-            if (window.DeviceOrientationEvent) {
-                window.addEventListener('deviceorientation', function(event) {
-                    let heading = event.webkitCompassHeading;
-                    if (typeof heading === "undefined" && event.alpha !== null) {
-                        heading = 360 - event.alpha;
-                    }
-                    if (heading !== null && heading !== undefined) {
-                        updateHeading(heading);
-                    } else {
-                        document.getElementById("warning").innerText = "Compass data unavailable. Try again later.";
-                    }
-                }, false);
-            } else {
-                document.getElementById("warning").innerText = "Your device does not support compass functionality.";
+    // Game navigation
+    document.querySelector('.container').addEventListener('click', e => {
+        if (e.target.classList.contains('feature')) {
+            const gameId = e.target.dataset.game;
+            showGame(gameId);
+            if (!games[gameId].initialized) {
+                games[gameId].init();
+                games[gameId].initialized = true;
             }
         }
+    });
 
-        function toggleTheme() {
-            document.body.classList.toggle("light-mode");
-        }
+    function showGame(gameId) {
+        document.querySelectorAll('.hidden').forEach(el => el.style.display = 'none');
+        document.getElementById(gameId).style.display = 'block';
+    }
+});
+document.addEventListener('DOMContentLoaded', () => {
+    // Learn Shapes
+    const shapes = ['Circle', 'Square', 'Triangle', 'Rectangle', 'Star', 'Hexagon'];
+    let shapeIndex = 0;
+    document.getElementById('nextShape').addEventListener('click', () => {
+        shapeIndex = (shapeIndex + 1) % shapes.length;
+        document.getElementById('shape').textContent = shapes[shapeIndex];
+    });
+
+    // Color Matching Game
+    color: { ['Red', 'Blue', 'Green', 'Yellow', 'Purple', 'Orange'];
+    let correctColor = colors[Math.floor(Math.random() * colors.length)];
+
+    document.getElementById('colorOptions').innerHTML = colors.map(color => 
+        `<button class="color-btn" data-color="${color}">${color}</button>`
+    ).join('');
+
+    document.querySelectorAll('.color-btn').forEach(button => {
+        button.addEventListener('click', () => {
+            if (button.dataset.color === correctColor) {
+                alert("Correct! 🎉");
+                correctColor = colors[Math.floor(Math.random() * colors.length)];
+            } else {
+                alert("Try Again! ❌");
+            }
+        });
+    });}
+
+    // Learn the Clock
+    document.getElementById('updateClock').addEventListener('click', () => {
+        const hours = Math.floor(Math.random() * 12) + 1;
+        const minutes = Math.floor(Math.random() * 60);
+        document.getElementById('clockTime').textContent = `${hours}:${minutes < 10 ? '0' : ''}${minutes}`;
+    });
+
+    // Flashcards
+    const flashcards = [
+        { question: "What color is the sky?", answer: "Blue" },
+        { question: "How many legs does a cat have?", answer: "Four" },
+        { question: "What shape has 3 sides?", answer: "Triangle" },
+    ];
+    let flashcardIndex = 0;
+    document.getElementById('flashcardQuestion').textContent = flashcards[flashcardIndex].question;
+    
+    document.getElementById('showAnswer').addEventListener('click', () => {
+        alert(flashcards[flashcardIndex].answer);
+    });
+
+    document.getElementById('nextFlashcard').addEventListener('click', () => {
+        flashcardIndex = (flashcardIndex + 1) % flashcards.length;
+        document.getElementById('flashcardQuestion').textContent = flashcards[flashcardIndex].question;
+    });
+
+    // Find the Difference Game (Basic)
+    document.getElementById('findDiffGame').addEventListener('click', () => {
+        alert("Spot the differences coming soon! 🧐");
+    });
+});
     </script>
 </body>
 </html>
