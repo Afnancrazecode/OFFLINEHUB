@@ -22,10 +22,21 @@
             border-radius: 10px;
             box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
         }
+        h2 {
+            font-family: 'Satisfy';
+            margin-bottom: 20px;
+        }
+        .input-group {
+            margin: 10px 0;
+            text-align: left;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
         select, input[type="button"] {
             width: 100%;
             padding: 10px;
-            margin: 5px 0;
             border: none;
             border-radius: 5px;
         }
@@ -34,6 +45,7 @@
             color: white;
             font-size: 16px;
             cursor: pointer;
+            margin-top: 10px;
         }
         input[type="button"]:hover {
             background: #16A085;
@@ -42,6 +54,17 @@
             margin-top: 20px;
             text-align: left;
         }
+        .footer {
+    margin-top: 30px;
+    font-family: 'Satisfy', cursive;
+    font-size: 20px;
+    color: #ECF0F1;
+}
+.footer span {
+    color: #1ABC9C;
+    font-weight: bold;
+}
+
     </style>
     <script>
         function calAge() {
@@ -59,7 +82,7 @@
             if (m < 0 || (m === 0 && d < 0)) {
                 age--;
             }
-            
+
             let ageInMonths = age * 12 + m;
             let ageInDays = Math.floor((today - birthDate) / (1000 * 60 * 60 * 24));
             let ageInSeconds = Math.floor((today - birthDate) / 1000);
@@ -83,18 +106,31 @@
 <body>
     <div class="container">
         <h2>Age Calculator</h2>
-        <label>Select Date of Birth:</label><br>
-        <select id="day"></select>
-        <select id="month"></select>
-        <select id="year"></select>
+        <div class="input-group">
+            <label for="day">Day</label>
+            <select id="day"></select>
+        </div>
+        <div class="input-group">
+            <label for="month">Month</label>
+            <select id="month"></select>
+        </div>
+        <div class="input-group">
+            <label for="year">Year</label>
+            <select id="year"></select>
+        </div>
+        <div class="footer">
+            <p>With ❤️ love from <span>OfflineHub</span></p>
+        </div>
+        
         <input type="button" value="Calculate Age" onclick="calAge()">
         <div class="results" id="age"></div>
     </div>
+
     <script>
         let daySelect = document.getElementById("day");
         let monthSelect = document.getElementById("month");
         let yearSelect = document.getElementById("year");
-        
+
         for (let i = 1; i <= 31; i++) {
             daySelect.innerHTML += `<option value="${i}">${i}</option>`;
         }
